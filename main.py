@@ -49,6 +49,7 @@ def compound_lending():
   lending_info = client.get_lending_info()
 
   for coin_lending_info in lending_info:
+    if coin_lending_info['coin'] not in coins: continue
     if coin_lending_info['lendable'] > 0.0:
       client.submit_lending_offer(coin_lending_info['coin'], coin_lending_info['lendable'], coin_lending_info['minRate'])
 
