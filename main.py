@@ -5,6 +5,7 @@ import os
 import datetime as dt
 import time
 import csv
+import math
 
 DATA_PATH = 'data.csv'
 
@@ -45,13 +46,18 @@ def record_rates():
     writer = csv.writer(csvfile)
     writer.writerow(row)
 
+def round_down(number: float, decimals: int=8):
+  factor = 10 ** decimals
+  return math.floor(number * factor) / factor
+
 def compound_lending():
   lending_info = client.get_lending_info()
-
+  
   for coin_lending_info in lending_info:
     if coin_lending_info['coin'] not in coins: continue
-    if coin_lending_info['lendable'] > 0.0:
-      client.submit_lending_offer(coin_lending_info['coin'], coin_lending_info['lendable'], coin_lending_info['minRate'])
+    if coin_lending_info['lendable'] > 0.01 and coin_lending_info['minRate'] is not None:
+      lendable = round_down(coin_lending_info['lendable'])
+      client.submit_lending_offer(coin_lending_info['coin'], lendable, coin_lending_info['minRate'])
 
 if __name__ == '__main__':
   if not os.path.exists(DATA_PATH):
